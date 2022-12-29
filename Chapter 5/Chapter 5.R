@@ -42,29 +42,21 @@ payoff <- function(x,strike,call=TRUE){
 ### The LSMC algorithm ###
 
 LSMC <- function(paths,strike,r,basis="Monomial",call=TRUE){
-  T <- dim(paths)[2] #this should be ex_opp...
+  T <- dim(paths)[2] 
   numpaths <- dim(paths)[1]
-  #A <- round(seq(T-1,2,-((T-1)/(ex_opp-1))))
   scenario <- matrix(0,numpaths,T)
-  #scenario <- matrix(0,numpaths,length(A)+2)
   for (i in (1:numpaths)) {
     scenario[i,T] <- payoff(paths[i,T],strike,call)
-    #scenario[i,length(A)+2] <- payoff(paths[i,T],strike,call)
   }
   pb <- txtProgressBar(min = 0, max = T-3, style = 3, width = 50, char = "=")
-  #pb <- txtProgressBar(min = 0, max = A[1]-A[length(A)], style = 3, width = 50, char = "=")
-  for (t in ((T-1):2)) { #seq(T-1,2,-((T-1-2)/ex_opp))
-    #for (t in round(seq(T-1,2,-((T-1)/(ex_opp-1))))){
-    #for (t in A){
+  for (t in ((T-1):2)) { 
     X <- rep(0,numpaths)
     Y <- rep(0,numpaths)
     for (i in 1:numpaths) {
       if (payoff(paths[i,t],strike,call)<=0){scenario[i,t] <- 0}
       else{
         X[i] <- paths[i,t]
-        Y[i] <- max(exp(-r*(1:(T-t)))*scenario[i,(t+1):T]) #still needs to be adapted for every t
-        #Y[i] <- max(exp(-r*(1:((length(A)+2)-t)))*scenario[i,(t+1):(length(A)+2)])
-        #Y[i] <- max(exp(-r*(-diff(c(rev(A[(match(t,rev(A))+1):length(A)]),T))))*scenario[i,c(A[(match(t,A)+1):length(A)],length(A)+2)]) #problem here, need to go through this with example
+        Y[i] <- max(exp(-r*(1:(T-t)))*scenario[i,(t+1):T]) 
       }
     }
     Yprime <- Y[!X==0]
@@ -99,8 +91,6 @@ LSMC <- function(paths,strike,r,basis="Monomial",call=TRUE){
             else{
               scenario[i,t] <- max(keep[i],payoff(paths[i,t],strike,call)) #max here necessary? could be payoff() directly
               scenario[i,(t+1):T] <- 0
-              #scenario[i,(t+1):(length(A)+2)] <- 0
-              #scenario[i,c(A[(match(t,A)+1):length(A)],length(A)+2)] <- 0
             }
           }
         }
@@ -142,20 +132,16 @@ LSMC <- function(paths,strike,r,basis="Monomial",call=TRUE){
             else{
               scenario[i,t] <- max(keep[i],payoff(paths[i,t],strike,call))
               scenario[i,(t+1):T] <- 0
-              #scenario[i,(t+1):(length(A)+2)] <- 0
-              #scenario[i,c(A[(match(t,A)+1):length(A)],length(A)+2)] <- 0
             }
           }
         }
       }
     }
     setTxtProgressBar(pb, T-1-t)
-    #setTxtProgressBar(pb, A[1]-t)
   }
   close(pb)
   for (i in 1:numpaths) {
     scenario[i,1] <- max(exp(-r*(1:(T-1)))*scenario[i,2:T])
-    #scenario[i,1] <- max(exp(-r*(1:((length(A)+2)-1)))*scenario[i,2:(length(A)+2)])
   }
   return((1/numpaths)*sum(scenario[,1]))
   #return(scenario)
@@ -600,12 +586,11 @@ exponential_shuffle <- function(l,truncorder,simple = FALSE){
   pb <- txtProgressBar(min = 0, max = length(l), style = 3, width = 50, char = "=")
   for (i in 1:length(l)) {
     argument <- l[i]
-    #truncorder <- nchar(strsplit(argument," ")[[1]][2]) #maybe this is wrong, but don't need to change anything, just comment it out and put truncorder in the arguments of the function
     word <- ""
     int <- c()
     for (j in 1:truncorder) {
       word <- shuffle(word,strsplit(argument," ")[[1]][2]) 
-      int <- c(int,paste(((as.numeric(strsplit(argument," ")[[1]][1]))^j)/factorial(j),word)) #if (nchar(word) <= truncorder) {int <- ...} maybe this is unnecessary if I have a condition before concatenation already
+      int <- c(int,paste(((as.numeric(strsplit(argument," ")[[1]][1]))^j)/factorial(j),word)) 
     }
     int <- c(paste(1,""),int)
     int_res <- res
@@ -689,13 +674,13 @@ optimalstopping <- function(pricepath,truncorder){
             l <- paste(k,a[i])
           }
           word <- c(word,l)
-          #rest of bazar
+          #rest
         }
         #word <- c(word,paste(runif(1,-K,K),l))
       }
       if ((l1_words(word)+degree_of_word(word)) <= K){
         pairing(stopping(word,truncorder),expsigna,keys(3,N))
-      } #or something like use the distributivity of scalar product and take out coefficents so that you end up with only the coefficients as unknowns and then use Linear Programming for each l(=combination of keys without coefficients)
+      } 
     }
   }
   pairing(stopping(l,truncorder),expsigna,key)
