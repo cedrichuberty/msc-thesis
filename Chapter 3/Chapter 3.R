@@ -130,7 +130,7 @@ SigMMD_test <- function(set1,set2,truncorder,conflevel){
   #c_alpha<-4*sqrt(-log(conflevel)/m)
   K <- 4 + 4/1
   c_alpha <- sqrt((2*K)/m)*(1+sqrt(2*log(1/conflevel)))
-  return(paste("The samples come from the same distribution:", SigMMD(set1,set2,truncorder)<=c_alpha))
+  return(paste("The samples come from the same distribution:", sqrt(SigMMD(set1,set2,truncorder))<=c_alpha))
 }
 
 ### Second order MMD                                  ###
@@ -510,8 +510,8 @@ for (i in (1:10)) {
     }
     
     TableSec34[2+i,(3*1)] <- ifelse((ks.test(stock_prices1[2,,],stock_prices2[2,,])$p.value >= conflevel),"Yes","No") 
-    TableSec34[2+i,(3*1)+1] <- ifelse((SigMMD(stock_prices1,stock_prices2,5) >= c_alpha),"No","Yes")
-    TableSec34[2+i,(3*1)+2] <- ifelse((secondorderMMD(stock_prices1,stock_prices2,0.5) >= c_alpha),"No","Yes")
+    TableSec34[2+i,(3*1)+1] <- ifelse((sqrt(SigMMD(stock_prices1,stock_prices2,5)) >= c_alpha),"No","Yes")
+    TableSec34[2+i,(3*1)+2] <- ifelse((sqrt(secondorderMMD(stock_prices1,stock_prices2,0.5)) >= c_alpha),"No","Yes")
   }
 }
 TableSec34
